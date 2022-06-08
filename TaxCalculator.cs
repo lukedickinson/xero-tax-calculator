@@ -8,10 +8,7 @@ namespace XeroTaxCalculator
     {
         private class ApiResponse
         {
-            public string countryName { get; set; }
             public decimal gstRate { get; set; }
-            public string currency { get; set; }
-            public char currencySymbol { get; set; }
         }
 
         public Dictionary<decimal, decimal> CalculateGST(List<Invoice> orders, string countryCode)
