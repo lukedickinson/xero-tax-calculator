@@ -14,36 +14,20 @@ namespace XeroTaxCalculator
             public char currencySymbol { get; set; }
         }
 
-        public Dictionary<decimal, decimal> CalculateGST(List<Invoice> orders, string countryName)
+        public Dictionary<decimal, decimal> CalculateGST(List<Invoice> orders, string countryCode)
         {
             const string URL = "http://127.0.0.1:8000/v1/tax/";
-            var responseCache = new List<RestSharp.RestResponse<ApiResponse>>();
+            var client = new RestClient(URL + countryCode);
+            var response = client.Execute<ApiResponse>(new RestRequest());
+
+            var responseData = response.Data;
             var result = new Dictionary<decimal, decimal>();
 
             foreach (Invoice i in orders)
             {
-                ApiResponse data = null;
-                foreach (RestSharp.RestResponse<ApiResponse> r in responseCache)
+                if (i.countryCode == countryCode)
                 {
-                    if (r.ResponseUri.AbsolutePath.Substring(8,2) == i.countryCode)
-                    {
-                        data = r.Data;
-                        break;
-                    }
-                }
-
-                if (data == null)
-                {
-                    var client = new RestClient(URL + i.countryCode);
-                    var response = client.Execute<ApiResponse>(new RestRequest());
-
-                    responseCache.Add(response);
-                    data = response.Data;
-                }
-
-                if (data.countryName == countryName)
-                {
-                    decimal taxInAmount = GetGstFromInclusiveAmount(data.gstRate, i.amount);
+                    decimal taxInAmount = GetGstFromInclusiveAmount(responseData.gstRate, i.amount);
                     result.Add(taxInAmount, i.amount);
                 }
             }
