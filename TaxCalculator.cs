@@ -14,14 +14,12 @@ namespace XeroTaxCalculator
             public char currencySymbol { get; set; }
         }
 
-
         public Dictionary<decimal, decimal> CalculateGST(List<Invoice> orders, string countryName)
         {
             const string URL = "http://127.0.0.1:8000/v1/tax/";
-
             var responseCache = new List<RestSharp.RestResponse<ApiResponse>>();
-
             var result = new Dictionary<decimal, decimal>();
+
             foreach (Invoice i in orders)
             {
                 ApiResponse data = null;
@@ -37,11 +35,9 @@ namespace XeroTaxCalculator
                 if (data == null)
                 {
                     var client = new RestClient(URL + i.countryCode);
-
                     var response = client.Execute<ApiResponse>(new RestRequest());
 
                     responseCache.Add(response);
-
                     data = response.Data;
                 }
 
